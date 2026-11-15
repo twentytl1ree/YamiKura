@@ -1,0 +1,7 @@
+services:
+  web:
+    image: spara-chall-pixelboard-web:latest
+    build: .
+    ports:
+      - "127.0.0.1:${HOST_PORT:-5050}:5050"
+    restart: unless-stopped

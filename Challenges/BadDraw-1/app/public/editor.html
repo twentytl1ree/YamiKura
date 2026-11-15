@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Editor</title>
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<div class="editor-shell">
+  <div class="editor-top">
+    <div class="brand">
+      <canvas class="brand-mark" width="28" height="28" id="markCanvas"></canvas>
+      <div class="brand-name">New Drawing</div>
+    </div>
+  </div>
+
+  <label for="titleInput">Title</label>
+  <input type="text" id="titleInput" placeholder="untitled" maxlength="40" />
+
+  <div class="canvas-wrap" style="margin-top: 14px;">
+    <canvas id="paintCanvas" width="384" height="384"></canvas>
+  </div>
+
+  <div class="palette" id="palette"></div>
+
+  <div class="editor-footer">
+    <button class="btn-primary" id="saveBtn">Save &amp; close</button>
+    <button class="btn-ghost" id="clearBtn">Clear</button>
+    <span class="hint-text" id="statusText"></span>
+  </div>
+</div>
+
+<script src="/pixel-avatar.js"></script>
+<script>
+  drawPixelAvatar(document.getElementById("markCanvas"), "pixelboard-mark");
+
+  const GRID_SIZE = 16;
+  const PALETTE = [
+    "#0d0f18", "#f7f3e8", "#ff5d73", "#ffb14e",
+    "#ffe14e", "#73e37c", "#4ecbff", "#8f6bff",
+    "#ff6bd6", "#5a6079"
+  ];
+
+  const token = localStorage.getItem("accessToken");
+  if (!token) {
+    document.getElementById("statusText").textContent = "not signed in";
+  }
+
+  const grid = new Array(GRID_SIZE * GRID_SIZE).fill(0);
+  let activeColor = 2;
+
+  const canvas = document.getElementById("paintCanvas");
+  const ctx = canvas.getContext("2d");
+  const cellSize = canvas.width / GRID_SIZE;
+
+  function paintCell(cellX, cellY, colorIndex) {
+    ctx.fillStyle = PALETTE[colorIndex];
+    ctx.fillRect(cellX * cellSize, cellY * cellSize, cellSize, cellSize);
+  }
+
+  function renderAll() {
+    for (let y = 0; y < GRID_SIZE; y++) {
+      for (let x = 0; x < GRID_SIZE; x++) {
+        paintCell(x, y, grid[y * GRID_SIZE + x]);
+      }
+    }
+  }
+
+  renderAll();
+
+  const palette = document.getElementById("palette");
+  PALETTE.forEach((color, index) => {
+    const swatch = document.createElement("div");
+    swatch.className = "swatch" + (index === activeColor ? " active" : "");
+    swatch.style.background = color;
+    swatch.addEventListener("click", () => {
+      activeColor = index;
+      document.querySelectorAll(".swatch").forEach((el) => el.classList.remove("active"));
+      swatch.classList.add("active");
+    });
+    palette.appendChild(swatch);
+  });
+
+  let painting = false;
+
+  function cellFromEvent(e) {
+    const rect = canvas.getBoundingClientRect();
+    const x = Math.floor((e.clientX - rect.left) / (rect.width / GRID_SIZE));
+    const y = Math.floor((e.clientY - rect.top) / (rect.height / GRID_SIZE));
+    return { x, y };
+  }
+
+  function applyPaint(e) {
+    const { x, y } = cellFromEvent(e);
+    if (x < 0 || y < 0 || x >= GRID_SIZE || y >= GRID_SIZE) return;
+    grid[y * GRID_SIZE + x] = activeColor;
+    paintCell(x, y, activeColor);
+  }
+
+  canvas.addEventListener("mousedown", (e) => { painting = true; applyPaint(e); });
+  canvas.addEventListener("mousemove", (e) => { if (painting) applyPaint(e); });
+  window.addEventListener("mouseup", () => { painting = false; });
+
+  document.getElementById("clearBtn").addEventListener("click", () => {
+    for (let i = 0; i < grid.length; i++) grid[i] = 0;
+    renderAll();
+  });
+
+  document.getElementById("saveBtn").addEventListener("click", async () => {
+    const statusText = document.getElementById("statusText");
+    const title = document.getElementById("titleInput").value.trim() || "untitled";
+    statusText.textContent = "saving...";
+    try {
+      const res = await fetch("/api/drawings", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + token
+        },
+        body: JSON.stringify({ title, grid })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        statusText.textContent = data.error || "failed to save";
+        return;
+      }
+      if (window.opener) {
+        window.opener.postMessage({ action: "drawingSaved" }, "*");
+      }
+      window.close();
+    } catch (err) {
+      statusText.textContent = "network error";
+    }
+  });
+</script>
+</body>
+</html>

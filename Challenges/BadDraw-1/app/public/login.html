@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>BadDraw 1 — Sign in</title>
+<link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+<div class="center-stage">
+  <div class="deco" aria-hidden="true">
+    <span class="tag d1">Draw</span>
+    <span class="tag d2">Share</span>
+    <span class="tag px d3">Repeat</span>
+    <span class="tag d4">16x16</span>
+  </div>
+  <div class="panel">
+    <div class="brand" style="margin-bottom: 18px;">
+      <canvas class="brand-mark" width="32" height="32" id="markCanvas"></canvas>
+      <div class="brand-name">Bad<span>Draw 1</span></div>
+    </div>
+    <h1 id="formTitle">Sign in</h1>
+    <p class="sub" id="formSub">Draw. Share. Repeat.</p>
+
+    <form id="authForm">
+      <label for="username">Username</label>
+      <input type="text" id="username" autocomplete="username" required />
+      <label for="password">Password</label>
+      <input type="password" id="password" autocomplete="current-password" required />
+      <button type="submit" class="btn-primary full" id="submitBtn">Sign in</button>
+    </form>
+
+    <div class="error-box" id="errorBox"></div>
+
+    <div class="toggle-row">
+      <span id="toggleText">No account yet?</span>
+      <a id="toggleLink">Create one</a>
+    </div>
+  </div>
+</div>
+
+<script src="/pixel-avatar.js"></script>
+<script>
+  drawPixelAvatar(document.getElementById("markCanvas"), "pixelboard-mark");
+
+  let mode = "login";
+  const form = document.getElementById("authForm");
+  const errorBox = document.getElementById("errorBox");
+  const submitBtn = document.getElementById("submitBtn");
+  const formTitle = document.getElementById("formTitle");
+  const formSub = document.getElementById("formSub");
+  const toggleText = document.getElementById("toggleText");
+  const toggleLink = document.getElementById("toggleLink");
+
+  function setMode(next) {
+    mode = next;
+    if (mode === "login") {
+      formTitle.textContent = "Sign in";
+      formSub.textContent = "Draw. Share. Repeat.";
+      submitBtn.textContent = "Sign in";
+      toggleText.textContent = "No account yet?";
+      toggleLink.textContent = "Create one";
+    } else {
+      formTitle.textContent = "Create account";
+      formSub.textContent = "Pick a username, start painting.";
+      submitBtn.textContent = "Create account";
+      toggleText.textContent = "Already have an account?";
+      toggleLink.textContent = "Sign in";
+    }
+    errorBox.style.display = "none";
+  }
+
+  toggleLink.addEventListener("click", () => setMode(mode === "login" ? "register" : "login"));
+
+  const existingToken = localStorage.getItem("accessToken");
+  if (existingToken) {
+    window.location.href = "/feed";
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorBox.style.display = "none";
+    const username = document.getElementById("username").value.trim();
+    const password = document.getElementById("password").value;
+    const endpoint = mode === "login" ? "/api/login" : "/api/register";
+    try {
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        errorBox.textContent = data.error || "something went wrong";
+        errorBox.style.display = "block";
+        return;
+      }
+      localStorage.setItem("accessToken", data.accessToken);
+      localStorage.setItem("username", data.username);
+      window.location.href = "/feed";
+    } catch (err) {
+      errorBox.textContent = "network error";
+      errorBox.style.display = "block";
+    }
+  });
+</script>
+</body>
+</html>
