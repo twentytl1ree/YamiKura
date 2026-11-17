@@ -1,0 +1,7 @@
+services:
+  web:
+    image: spara-chall-freya-web:latest
+    build: .
+    ports:
+      - "127.0.0.1:${HOST_PORT}:2000"
+    restart: unless-stopped

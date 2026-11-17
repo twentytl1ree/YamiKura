@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Freya</title>
+  <meta name="description" content="Format a small note and share it with a link.">
+  <link rel="icon" href="/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-mark">F</span>
+        <span>
+          <strong>FREYA</strong>
+          <small>notes</small>
+        </span>
+      </a>
+      <nav>
+        <a href="#editor">Editor</a>
+        <a href="#how">How it works</a>
+      </nav>
+      <div class="status"><i></i> WARD ACTIVE</div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">WORDS OUTLIVE THEIR SPEAKER</p>
+          <h1>Carve carefully.<br><em>Send beyond.</em></h1>
+          <p>Shape a message, bind it into a private rune, and send it beyond the path. No account. No history. Only the words remain.</p>
+        </div>
+
+        <div class="hero-panel" aria-hidden="true">
+          <div class="panel-meta">
+            <span>RUNE / 05</span>
+            <span>SEALED</span>
+          </div>
+          <div class="abstract-note">
+            <i></i><i></i><i></i>
+            <strong>Words carved.<br>One path.</strong>
+            <span>CARVE · BIND · SEND</span>
+          </div>
+          <div class="panel-foot">
+            <span>RUNE</span>
+            <b></b>
+            <span>WARD</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="editor-section" id="editor">
+        <div class="section-number">01</div>
+        <div class="editor-wrap">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">INSCRIBE</p>
+              <h2>What will you leave behind?</h2>
+            </div>
+            <span id="character-count">0 / 2000</span>
+          </div>
+
+          <div class="editor-card">
+            <div class="toolbar" role="toolbar" aria-label="Text formatting">
+              <button type="button" data-command="bold" aria-label="Bold"><b>B</b></button>
+              <button type="button" data-command="italic" aria-label="Italic"><i>I</i></button>
+              <button type="button" data-command="underline" aria-label="Underline"><u>U</u></button>
+              <span class="toolbar-rule"></span>
+              <button class="reaction-button" id="reaction-button" type="button" aria-expanded="false">
+                <span>♡</span> Reactions
+              </button>
+              <button class="clear-button" id="clear-button" type="button">Clear</button>
+              <div class="reaction-menu" id="reaction-menu" hidden></div>
+            </div>
+
+            <div
+              class="editor"
+              id="note-editor"
+              contenteditable="true"
+              role="textbox"
+              aria-multiline="true"
+              data-placeholder="Carve your message here…"
+              spellcheck="true"
+            ></div>
+
+            <div class="editor-foot">
+              <span>Your markings are preserved in the rune.</span>
+              <span>⌘ + Enter to bind</span>
+            </div>
+          </div>
+
+          <button class="make-link" id="make-link" type="button">
+            <span>Bind the rune</span>
+            <i>↗</i>
+          </button>
+          <p class="editor-status" id="editor-status" role="status" aria-live="polite"></p>
+        </div>
+      </section>
+
+      <section class="result-section" id="result-section" hidden>
+        <div class="section-number">02</div>
+        <div class="result-wrap">
+          <div class="section-head">
+            <div>
+              <p class="eyebrow">RUNE BOUND</p>
+              <h2>Your words have a path.</h2>
+            </div>
+            <span class="fresh"><i></i> SEAL INTACT</span>
+          </div>
+
+          <div class="link-box">
+            <input id="generated-link" readonly aria-label="Generated note link">
+            <button id="copy-link" type="button">Copy link</button>
+            <a id="open-link" target="_blank" rel="noopener">Open ↗</a>
+          </div>
+          <p class="copy-status" id="copy-status"></p>
+
+          <div class="preview-card">
+            <span>RUNE PREVIEW</span>
+            <div id="note-preview"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="how" id="how">
+        <p class="eyebrow">HOW IT WORKS</p>
+        <div>
+          <article><span>01</span><h3>Carve</h3><p>Write a thought and mark the words that carry weight.</p></article>
+          <article><span>02</span><h3>Bind</h3><p>Freya seals the message into a compact rune link.</p></article>
+          <article><span>03</span><h3>Send</h3><p>Anyone who holds the rune can read your words.</p></article>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <span>FREYA RUNES</span>
+      <p>Words bound for those who know the path.</p>
+      <span>SESSION 05</span>
+    </footer>
+  </div>
+  <script src="/app.js"></script>
+</body>
+</html>
