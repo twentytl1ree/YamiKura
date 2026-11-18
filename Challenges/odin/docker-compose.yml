@@ -1,0 +1,7 @@
+services:
+  web:
+    image: spara-chall-csp-web:latest
+    build: .
+    ports:
+      - "127.0.0.1:5058:2000"
+    restart: unless-stopped
