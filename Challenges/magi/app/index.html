@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Magi · Return Desk</title>
+  <link rel="icon" href="favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DotGothic16&family=Pixelify+Sans:wght@400;600&family=Press+Start+2P&display=swap">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="sky" aria-hidden="true">
+    <span class="moon"></span>
+    <span class="cloud cloud-a"></span>
+    <span class="cloud cloud-b"></span>
+  </div>
+
+  <div class="scene">
+    <header class="masthead">
+      <p class="jp" lang="ja">まぎ・かえりみち</p>
+      <h1 class="logo">MAGI</h1>
+      <p class="station">RETURN DESK // STATION 23</p>
+    </header>
+
+    <main class="game-grid">
+      <section class="game-window">
+        <div class="titlebar">
+          <span>RETURN_DESK.EXE</span>
+          <span aria-hidden="true">_ □ ×</span>
+        </div>
+
+        <div class="counter">
+          <div class="clerk" aria-hidden="true">
+            <div class="portrait">
+              <div class="hair-back"></div>
+              <div class="ear ear-l"></div><div class="ear ear-r"></div>
+              <div class="face">
+                <i class="eye eye-l"></i><i class="eye eye-r"></i>
+                <i class="blush blush-l"></i><i class="blush blush-r"></i>
+                <i class="mouth"></i>
+              </div>
+              <div class="bang bang-a"></div><div class="bang bang-b"></div>
+              <div class="uniform"><i></i></div>
+            </div>
+            <span class="clerk-name">MIO // 案内係</span>
+          </div>
+
+          <div class="decision" aria-live="polite">
+            <div id="statusPill" class="pill-status state-empty">
+              <span class="status-icon">!</span>
+              <span id="statusPillText">Waiting for an app</span>
+            </div>
+
+            <div class="dialogue">
+              <span class="speaker">MIO</span>
+              <h2 id="title">No destination</h2>
+              <p id="subtitle">Where to?</p>
+              <span class="next" aria-hidden="true">▼</span>
+            </div>
+
+            <div class="dest-box" id="destBox" style="display:none;">
+              <span>DESTINATION</span>
+              <strong id="destValue"></strong>
+            </div>
+
+            <p class="note" id="note"></p>
+            <div id="slip"></div>
+
+            <button id="go" type="button" disabled>Waiting…</button>
+            <p class="hint">Only an approved partner can continue.</p>
+          </div>
+        </div>
+
+        <noscript><p class="noscript">JavaScript is required to run this local challenge.</p></noscript>
+      </section>
+
+      <aside class="quest">
+        <div class="quest-title"><span>!</span> SIDE QUEST</div>
+        <p class="quest-id">CHALLENGE // 01</p>
+        <h2>Can you spot the vulnerability?</h2>
+        <p>A partner app opens this station with a return address. The desk checks it before sending anyone onward.</p>
+        <ul>
+          <li><i class="gem gem-yellow"></i><span><b>WAITING</b>No return address found.</span></li>
+          <li><i class="gem gem-red"></i><span><b>BLOCKED</b>Partner not registered.</span></li>
+          <li><i class="gem gem-green"></i><span><b>APPROVED</b>Return gate unlocked.</span></li>
+        </ul>
+        <div class="inventory">
+          <span>KEY ITEM</span>
+          <code>redirect_uri</code>
+        </div>
+        <p class="local">LOCAL TRAINING RANGE // SCRIPT UNCHANGED</p>
+      </aside>
+    </main>
+
+    <footer>MAGI NETWORK © 20XX · INSERT CURIOSITY TO CONTINUE</footer>
+  </div>
+
+  <script>
+const TRUSTED_HOST = "23.me";
+const redirect_uri = new URLSearchParams(location.search).get("redirect_uri");
+
+function isTrustedHost(url) {
+  try { return new URL(url).host === TRUSTED_HOST; } catch (e) { return false; }
+}
+
+const slip = document.getElementById("slip");
+
+function show(state, title, subtitle, dest, note, pill, caption) {
+  const pillEl = document.getElementById("statusPill");
+  const pillTextEl = document.getElementById("statusPillText");
+  pillEl.className = "pill-status state-" + state;
+  pillTextEl.textContent = caption || state;
+
+  document.getElementById("title").textContent = title || "";
+  document.getElementById("subtitle").textContent = subtitle || "";
+
+  const destBox = document.getElementById("destBox");
+  if (dest) {
+    destBox.style.display = "block";
+    document.getElementById("destValue").textContent = dest;
+  } else {
+    destBox.style.display = "none";
+  }
+
+  document.getElementById("note").textContent = note || "";
+
+  slip.innerHTML =
+    '<div style="margin-top:14px;padding:10px 12px;border-radius:10px;' +
+    'background:rgba(0,0,0,0.25);border:1px solid #3a2f6b;font-size:15px;' +
+    'color:#a79fcf;text-align:center;">' +
+    'Partner tag: <b style="color:#eae6ff">' + pill + '</b>' +
+    '</div>';
+}
+
+const go = document.getElementById("go");
+
+if (!redirect_uri) {
+  show("empty", "No destination", "Where to?", "", "", "No destination", "Waiting for an app");
+} else if (!isTrustedHost(redirect_uri)) {
+  const host = (redirect_uri.split("/")[2] || redirect_uri).slice(0, 60);
+  show("blocked", "Blocked", "Not an approved partner", "", "", host, "Return address not registered");
+} else {
+  const host = new URL(redirect_uri).host;
+  show("ok", "Link complete", "Continue to", host, "Your membership is connected.", host, "Approved partner");
+  go.disabled = false;
+  go.textContent = "Continue to " + host;
+  go.addEventListener("click", () => { window.location = redirect_uri; });
+  window.location = redirect_uri; 
+}
+  </script>
+</body>
+</html>
+
